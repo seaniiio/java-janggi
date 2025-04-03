@@ -11,15 +11,17 @@ public class FakeMoveHistoryDao implements MoveHistoryDao {
 
     private final Map<Integer, History> histories;
     private int sequence;
+
     public FakeMoveHistoryDao() {
         this.histories = new HashMap<>();
         this.sequence = 1;
     }
 
     @Override
-    public void addHistory(int gameId, int originId, int destinationId) {
+    public int addHistory(int gameId, int originId, int destinationId) {
         histories.put(sequence, new History(gameId, originId, destinationId));
         sequence++;
+        return sequence - 1;
     }
 
     @Override

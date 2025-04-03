@@ -5,6 +5,7 @@ import util.DatabaseConnector;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class JdbcJanggiPositionDao implements JanggiPositionDao {
 
@@ -14,13 +15,19 @@ public class JdbcJanggiPositionDao implements JanggiPositionDao {
         this.connector = connector;
     }
 
-    public void addPosition(final JanggiPosition position) {
+    public int addPosition(final JanggiPosition position) {
         final String query = "INSERT INTO janggi_position(rank_value, file_value) VALUES(?, ?)";
         try (final var connection = connector.getConnection();
-             final var preparedStatement = connection.prepareStatement(query)) {
+             final var preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, position.getRank());
             preparedStatement.setInt(2, position.getFile());
             preparedStatement.executeUpdate();
+            try (final var generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                throw new SQLException("위치 저장에 실패했습니다.");
+            }
         } catch (SQLException e) {
             throw new IllegalStateException("데이터 삽입에 실패했습니다.");
         }

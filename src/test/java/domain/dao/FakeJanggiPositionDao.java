@@ -1,6 +1,7 @@
 package domain.dao;
 
 import domain.position.JanggiPosition;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +16,10 @@ public class FakeJanggiPositionDao implements JanggiPositionDao {
     }
 
     @Override
-    public void addPosition(JanggiPosition position) {
+    public int addPosition(JanggiPosition position) {
         positions.put(sequence, position);
         sequence++;
+        return sequence - 1;
     }
 
     @Override

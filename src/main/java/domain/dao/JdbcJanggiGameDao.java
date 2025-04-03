@@ -6,6 +6,7 @@ import util.DatabaseConnector;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class JdbcJanggiGameDao implements JanggiGameDao {
 
@@ -15,13 +16,21 @@ public class JdbcJanggiGameDao implements JanggiGameDao {
         this.connector = connector;
     }
 
-    public void addGame(final BoardArrangementStrategy strategyOfCho, final BoardArrangementStrategy strategyOfHan) {
+    public int addGame(final BoardArrangementStrategy strategyOfCho, final BoardArrangementStrategy strategyOfHan) {
         final String query = "INSERT INTO janggi_game(cho_strategy, han_strategy) VALUES(?, ?)";
         try (final var connection = connector.getConnection();
-             final var preparedStatement = connection.prepareStatement(query)) {
+             final var preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, parseStrategy(strategyOfCho));
             preparedStatement.setInt(2, parseStrategy(strategyOfHan));
             preparedStatement.executeUpdate();
+
+            try (final var generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                throw new SQLException("게임 저장에 실패했습니다.");
+            }
+
         } catch (SQLException e) {
             throw new IllegalStateException(e.getMessage());
         }

@@ -5,6 +5,7 @@ import util.DatabaseConnector;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +17,20 @@ public class JdbcMoveHistoryDao implements MoveHistoryDao {
         this.connector = connector;
     }
 
-    public void addHistory(final int gameId, final int originId, final int destinationId) {
+    public int addHistory(final int gameId, final int originId, final int destinationId) {
         final String query = "INSERT INTO move_history(game, origin, destination) VALUES(?, ?, ?)";
         try (final var connection = connector.getConnection();
-             final var preparedStatement = connection.prepareStatement(query)) {
+             final var preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, gameId);
             preparedStatement.setInt(2, originId);
             preparedStatement.setInt(3, destinationId);
             preparedStatement.executeUpdate();
+            try (final var generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                throw new SQLException("기록 저장에 실패했습니다.");
+            }
         } catch (SQLException e) {
             throw new IllegalStateException(e.getMessage());
         }

@@ -1,20 +1,11 @@
 package domain.dao;
 
 import domain.janggiboard.customstrategy.BoardArrangementStrategy;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class FakeJanggiGameDao implements JanggiGameDao {
-
-    private class Strategies {
-        private final BoardArrangementStrategy strategyOfCho;
-        private final BoardArrangementStrategy strategyOfHan;
-
-        public Strategies(BoardArrangementStrategy strategyOfCho, BoardArrangementStrategy strategyOfHan) {
-            this.strategyOfCho = strategyOfCho;
-            this.strategyOfHan = strategyOfHan;
-        }
-    }
 
     private final Map<Integer, Strategies> game;
 
@@ -23,8 +14,9 @@ public class FakeJanggiGameDao implements JanggiGameDao {
     }
 
     @Override
-    public void addGame(BoardArrangementStrategy strategyOfCho, BoardArrangementStrategy strategyOfHan) {
+    public int addGame(BoardArrangementStrategy strategyOfCho, BoardArrangementStrategy strategyOfHan) {
         game.put(1, new Strategies(strategyOfCho, strategyOfHan));
+        return 1;
     }
 
     @Override
@@ -48,5 +40,15 @@ public class FakeJanggiGameDao implements JanggiGameDao {
     @Override
     public void deleteAll() {
         this.game.clear();
+    }
+
+    private class Strategies {
+        private final BoardArrangementStrategy strategyOfCho;
+        private final BoardArrangementStrategy strategyOfHan;
+
+        public Strategies(BoardArrangementStrategy strategyOfCho, BoardArrangementStrategy strategyOfHan) {
+            this.strategyOfCho = strategyOfCho;
+            this.strategyOfHan = strategyOfHan;
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MoveHistoryDao {
 
-    void addHistory(final int gameId, final int originId, final int destinationId);
+    int addHistory(final int gameId, final int originId, final int destinationId);
 
     void deleteAll();
 
